@@ -147,7 +147,7 @@ public class RetryPolicyTests {
                 Assertions.assertTrue(count++ < maxRetries);
                 return new MockHttpResponse(request, 500);
             }
-        }).policies(new HttpRetryPolicy(5, Duration.ofMillis(1))).build();
+        }).policies(new HttpRetryPolicy(new HttpRetryOptions(5, Duration.ofMillis(1)))).build();
 
         try (Response<?> response = sendRequest(pipeline)) {
             assertEquals(500, response.getStatusCode());
@@ -177,7 +177,7 @@ public class RetryPolicyTests {
                 beforeSendingRequest();
                 return new MockHttpResponse(request, 500);
             }
-        }).policies(new HttpRetryPolicy(5, Duration.ofMillis(delayMillis))).build();
+        }).policies(new HttpRetryPolicy(new HttpRetryOptions(5, Duration.ofMillis(delayMillis)))).build();
 
         try (Response<?> response = sendRequest(pipeline)) {
             assertEquals(500, response.getStatusCode());
@@ -235,7 +235,7 @@ public class RetryPolicyTests {
         HttpClient httpClient = request -> closeTrackingHttpResponse;
 
         final HttpPipeline pipeline
-            = new HttpPipelineBuilder().policies(new HttpRetryPolicy(2, Duration.ofMillis(1)))
+            = new HttpPipelineBuilder().policies(new HttpRetryPolicy(new HttpRetryOptions(2, Duration.ofMillis(1))))
                 .httpClient(httpClient)
                 .build();
 
@@ -253,7 +253,7 @@ public class RetryPolicyTests {
         };
 
         final HttpPipeline pipeline
-            = new HttpPipelineBuilder().policies(new HttpRetryPolicy(2, Duration.ofMillis(1)))
+            = new HttpPipelineBuilder().policies(new HttpRetryPolicy(new HttpRetryOptions(2, Duration.ofMillis(1))))
                 .httpClient(httpClient)
                 .build();
 

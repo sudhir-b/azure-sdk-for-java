@@ -75,23 +75,11 @@ public class HttpRetryPolicy implements HttpPipelinePolicy {
     }
 
     /**
-     * Creates a {@link HttpRetryPolicy} with the specified maximum retries and fixed delay.
-     *
-     * @param maxRetries The maximum number of retry attempts.
-     * @param fixedDelay The fixed delay between retry attempts.
-     */
-    public HttpRetryPolicy(int maxRetries, Duration fixedDelay) {
-        this(null, null, fixedDelay, maxRetries, null, null);
-    }
-
-    /**
      * Creates a {@link HttpRetryPolicy} with the provided {@link HttpRetryOptions}.
      *
      * @param retryOptions The {@link HttpRetryOptions} used to configure this {@link HttpRetryPolicy}.
      * @throws NullPointerException If {@code retryOptions} is null.
-     * @deprecated Use {@link #HttpRetryPolicy(int, Duration)} instead.
      */
-    @Deprecated
     public HttpRetryPolicy(HttpRetryOptions retryOptions) {
         this(retryOptions.getBaseDelay(), retryOptions.getMaxDelay(), retryOptions.getFixedDelay(),
             retryOptions.getMaxRetries(), retryOptions.getDelayFromHeaders(), retryOptions.getShouldRetryCondition());

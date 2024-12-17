@@ -4,7 +4,9 @@
 package io.clientcore.core.http;
 
 import io.clientcore.core.http.client.HttpClient;
+import io.clientcore.core.http.models.HttpRetryOptions;
 import io.clientcore.core.http.pipeline.HttpPipeline;
+import java.time.Duration;
 import io.clientcore.core.http.pipeline.HttpPipelineBuilder;
 import io.clientcore.core.http.pipeline.HttpRetryPolicy;
 
@@ -22,7 +24,7 @@ public class HttpPipelineBuilderJavaDocCodeSnippets {
         // BEGIN: io.clientcore.core.http.HttpPipelineBuilder.defaultHttpClientWithRetryPolicy
         HttpPipeline pipeline = new HttpPipelineBuilder()
             .httpClient(HttpClient.getNewInstance())
-            .policies(new HttpRetryPolicy())
+            .policies(new HttpRetryPolicy(new HttpRetryOptions(3, Duration.ofSeconds(1))))
             .build();
         // END: io.clientcore.core.http.HttpPipelineBuilder.defaultHttpClientWithRetryPolicy
     }
