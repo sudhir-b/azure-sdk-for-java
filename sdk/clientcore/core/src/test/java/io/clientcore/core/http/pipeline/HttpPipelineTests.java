@@ -11,7 +11,6 @@ import io.clientcore.core.http.models.Response;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,9 +33,7 @@ public class HttpPipelineTests {
     @Test
     public void withRequestPolicy() {
         HttpPipeline pipeline
-            = new HttpPipelineBuilder()
-                .policies(new HttpRetryPolicy(new HttpRetryOptions(3, Duration.ofSeconds(1))))
-                .httpClient(new NoOpHttpClient() {
+            = new HttpPipelineBuilder().policies(new HttpRetryPolicy()).httpClient(new NoOpHttpClient() {
                 @Override
                 public Response<?> send(HttpRequest request) {
                     // do nothing
@@ -52,9 +49,7 @@ public class HttpPipelineTests {
     @Test
     public void withRequestOptions() {
         HttpPipeline pipeline
-            = new HttpPipelineBuilder()
-                .policies(new HttpRetryPolicy(new HttpRetryOptions(3, Duration.ofSeconds(1))))
-                .httpClient(new NoOpHttpClient() {
+            = new HttpPipelineBuilder().policies(new HttpRetryPolicy()).httpClient(new NoOpHttpClient() {
                 @Override
                 public Response<?> send(HttpRequest request) {
                     // do nothing
