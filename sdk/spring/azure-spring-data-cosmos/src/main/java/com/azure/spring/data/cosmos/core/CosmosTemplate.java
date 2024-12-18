@@ -1153,6 +1153,20 @@ public class CosmosTemplate implements CosmosOperations, ApplicationContextAware
     @Override
     public <T> Iterable<T> runQuery(SqlQuerySpec querySpec, Sort sort, Class<?> domainType, Class<T> returnType) {
         querySpec = NativeQueryGenerator.getInstance().generateSortedQuery(querySpec, sort);
+
+        // Check if this is an aggregation query that should return a scalar value
+        String queryText = querySpec.getQueryText().toLowerCase();
+        boolean isScalarAggregation = queryText.contains("select value sum(")
+            || queryText.contains("select value avg(")
+            || queryText.contains("select value min(")
+            || queryText.contains("select value max(")
+            || queryText.contains("select value count(");
+
+        if (isScalarAggregation && (returnType == Long.class || returnType == Integer.class || returnType == Double.class)) {
+            T result = executeScalarQuery(CosmosQuery.fromSqlQuerySpec(querySpec), getContainerName(domainType), domainType, returnType);
+            return Collections.singleton(result);
+        }
+
         return getJsonNodeFluxFromQuerySpec(getContainerName(domainType), querySpec)
             .map(jsonNode -> emitOnLoadEventAndConvertToDomainObject(returnType, getContainerName(domainType), jsonNode))
             .collectList()
@@ -1199,6 +1213,48 @@ public class CosmosTemplate implements CosmosOperations, ApplicationContextAware
             .getContainer(containerName)
             .queryItems(sqlQuerySpec, options, JsonNode.class)
             .byPage();
+    }
+
+    /**
+     * Execute a query that returns a single scalar value from an aggregation function (SUM, AVG, MIN, MAX)
+     *
+     * @param query The query to execute
+     * @param containerName The container name
+     * @param domainType The domain type
+     * @param resultType The expected result type (Long, Integer, etc.)
+     * @return The scalar result value
+     */
+    private <T, R> R executeScalarQuery(@NonNull CosmosQuery query,
+                                       @NonNull String containerName,
+                                       @NonNull Class<T> domainType,
+                                       @NonNull Class<R> resultType) {
+        final SqlQuerySpec sqlQuerySpec = new FindQuerySpecGenerator().generateCosmos(query);
+        final CosmosQueryRequestOptions options = new CosmosQueryRequestOptions();
+        containerName = getContainerNameOverride(containerName);
+        options.setQueryMetricsEnabled(this.queryMetricsEnabled);
+        options.setMaxDegreeOfParallelism(this.maxDegreeOfParallelism);
+
+        JsonNode result = executeQuery(sqlQuerySpec, containerName, options)
+            .publishOn(CosmosSchedulers.SPRING_DATA_COSMOS_PARALLEL)
+            .onErrorResume(throwable ->
+                CosmosExceptionUtils.exceptionHandler("Failed to execute scalar query", throwable,
+                    this.responseDiagnosticsProcessor))
+            .doOnNext(response -> CosmosUtils.fillAndProcessResponseDiagnostics(this.responseDiagnosticsProcessor,
+                response.getCosmosDiagnostics(), response))
+            .next()
+            .map(r -> r.getResults().get(0))
+            .block();
+
+        assert result != null;
+        if (resultType == Long.class) {
+            return resultType.cast(result.asLong());
+        } else if (resultType == Integer.class) {
+            return resultType.cast(result.asInt());
+        } else if (resultType == Double.class) {
+            return resultType.cast(result.asDouble());
+        } else {
+            throw new IllegalArgumentException("Unsupported scalar result type: " + resultType);
+        }
     }
 
     private <T> Flux<JsonNode> findItemsAsFlux(@NonNull CosmosQuery query,

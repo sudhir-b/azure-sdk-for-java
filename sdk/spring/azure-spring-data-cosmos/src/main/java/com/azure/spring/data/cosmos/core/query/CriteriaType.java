@@ -133,7 +133,12 @@ public enum CriteriaType {
     /**
      * Not Contain
      */
-    NOT_CONTAINING("NOT CONTAINS");
+    NOT_CONTAINING("NOT CONTAINS"),
+
+    /**
+     * Raw SQL query
+     */
+    SQL_QUERY("");
 
     private String sqlKeyword;
 
