@@ -155,18 +155,23 @@ public final class ChatRequestUserMessage extends ChatRequestMessage {
      */
     public static ChatRequestUserMessage fromJson(JsonReader jsonReader) throws IOException {
         return jsonReader.readObject(reader -> {
+            String stringContent = null;
+            List<ChatMessageContentItem> chatMessageContentItems = null;
             BinaryData content = null;
             ChatRole role = ChatRole.USER;
             String name = null;
+
             while (reader.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = reader.getFieldName();
                 reader.nextToken();
                 if ("content".equals(fieldName)) {
                     if (reader.currentToken() == JsonToken.STRING) {
-                        content = BinaryData.fromString(reader.getString());
+                        stringContent = reader.getString();
+                        content = BinaryData.fromString(stringContent);
                     } else if (reader.currentToken() == JsonToken.START_ARRAY) {
-                        content = BinaryData.fromObject(
-                            reader.readArray(arrayReader -> arrayReader.readObject(ChatMessageContentItem::fromJson)));
+                        chatMessageContentItems = reader.readArray(arrayReader -> 
+                            arrayReader.readObject(ChatMessageContentItem::fromJson));
+                        content = BinaryData.fromObject(chatMessageContentItems);
                     } else {
                         throw new IllegalStateException("Unexpected 'content' type found when deserializing"
                             + " ChatRequestUserMessage JSON object: " + reader.currentToken());
@@ -179,10 +184,20 @@ public final class ChatRequestUserMessage extends ChatRequestMessage {
                     reader.skipChildren();
                 }
             }
-            ChatRequestUserMessage deserializedChatRequestUserMessage = new ChatRequestUserMessage(content);
-            deserializedChatRequestUserMessage.role = role;
-            deserializedChatRequestUserMessage.name = name;
-            return deserializedChatRequestUserMessage;
+
+            // Create the appropriate instance based on the content type
+            ChatRequestUserMessage message;
+            if (stringContent != null) {
+                message = new ChatRequestUserMessage(stringContent);
+            } else if (chatMessageContentItems != null) {
+                message = new ChatRequestUserMessage(chatMessageContentItems);
+            } else {
+                message = new ChatRequestUserMessage("");  // Default to empty string if no content
+            }
+
+            message.role = role;
+            message.name = name;
+            return message;
         });
     }
 }
