@@ -1,0 +1,11 @@
+        EmailMessage message = new EmailMessage()
+                .setSenderAddress(senderAddress)
+                .setToRecipients(recipientAddress)
+                .setSubject(subject)
+                .setBodyHtml(body)
+                .setAttachments(Arrays.stream(attachments)
+                    .map(att -> new EmailAttachment(
+                        att.getName(),
+                        att.getContentType(),
+                        BinaryData.fromBytes(Base64.getEncoder().encode(att.getContent()))))
+                    .toList());
