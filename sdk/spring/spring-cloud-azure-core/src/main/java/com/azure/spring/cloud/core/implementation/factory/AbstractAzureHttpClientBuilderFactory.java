@@ -170,18 +170,55 @@ public abstract class AbstractAzureHttpClientBuilderFactory<T> extends AbstractA
     protected void configureHttpTransportProperties(T builder) {
         final ClientOptionsProvider.ClientOptions client = getAzureProperties().getClient();
         if (client == null) {
+            // Try to get timeouts from parent properties
+            ClientOptionsProvider.HttpClientOptions globalProperties = getGlobalHttpClientOptions();
+            if (globalProperties != null) {
+                applyHttpClientOptions(globalProperties);
+            }
             return;
         }
-        final ClientOptionsProvider.HttpClientOptions properties;
         if (client instanceof ClientOptionsProvider.HttpClientOptions) {
-            properties = (ClientOptionsProvider.HttpClientOptions) client;
+            final ClientOptionsProvider.HttpClientOptions properties = (ClientOptionsProvider.HttpClientOptions) client;
+            applyHttpClientOptions(properties);
+        } else {
+            // Try to get timeouts from parent properties
+            ClientOptionsProvider.HttpClientOptions globalProperties = getGlobalHttpClientOptions();
+            if (globalProperties != null) {
+                applyHttpClientOptions(globalProperties);
+            }
+        }
+    }
+
+    private void applyHttpClientOptions(ClientOptionsProvider.HttpClientOptions properties) {
+        if (properties.getWriteTimeout() != null) {
             httpClientOptions.setWriteTimeout(properties.getWriteTimeout());
+        }
+        if (properties.getResponseTimeout() != null) {
             httpClientOptions.responseTimeout(properties.getResponseTimeout());
+        }
+        if (properties.getReadTimeout() != null) {
             httpClientOptions.readTimeout(properties.getReadTimeout());
+        }
+        if (properties.getConnectTimeout() != null) {
             httpClientOptions.setConnectTimeout(properties.getConnectTimeout());
+        }
+        if (properties.getConnectionIdleTimeout() != null) {
             httpClientOptions.setConnectionIdleTimeout(properties.getConnectionIdleTimeout());
+        }
+        if (properties.getMaximumConnectionPoolSize() != null) {
             httpClientOptions.setMaximumConnectionPoolSize(properties.getMaximumConnectionPoolSize());
         }
+    }
+
+    private ClientOptionsProvider.HttpClientOptions getGlobalHttpClientOptions() {
+        AzureProperties globalProperties = getAzureProperties();
+        if (globalProperties instanceof ClientOptionsProvider) {
+            ClientOptionsProvider.ClientOptions globalClient = ((ClientOptionsProvider) globalProperties).getClient();
+            if (globalClient instanceof ClientOptionsProvider.HttpClientOptions) {
+                return (ClientOptionsProvider.HttpClientOptions) globalClient;
+            }
+        }
+        return null;
     }
 
     @Override
