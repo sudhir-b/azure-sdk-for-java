@@ -156,7 +156,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      * @return The percentage of the index covered in the search request if {@code minimumCoverage} was set in the
      * request, otherwise null.
      */
-    Double getCoverage() {
+    public Double getCoverage() {
         return coverage;
     }
 
@@ -167,7 +167,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return The facet query results if {@code facets} were supplied in the request, otherwise null.
      */
-    Map<String, List<FacetResult>> getFacets() {
+    public Map<String, List<FacetResult>> getFacets() {
         return facets;
     }
 
@@ -179,7 +179,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      * @return The approximate number of documents that match the request if {@code count} is {@code true}, otherwise
      * null.
      */
-    Long getCount() {
+    public Long getCount() {
         return count;
     }
 
@@ -190,7 +190,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return The answer results if {@code answers} were supplied in the request, otherwise null.
      */
-    List<QueryAnswerResult> getQueryAnswers() {
+    public List<QueryAnswerResult> getQueryAnswers() {
         return queryAnswers;
     }
 
@@ -199,7 +199,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return Reason that a partial response was returned for a semantic search request if response was partial.
      */
-    SemanticErrorReason getSemanticErrorReason() {
+    public SemanticErrorReason getSemanticErrorReason() {
         return semanticErrorReason;
     }
 
@@ -208,7 +208,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return Type of the partial response returned for a semantic search request if response was partial.
      */
-    SemanticSearchResultsType getSemanticSearchResultsType() {
+    public SemanticSearchResultsType getSemanticSearchResultsType() {
         return semanticSearchResultsType;
     }
 
@@ -217,7 +217,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return The debug information that can be used to further explore your search results.
      */
-    DebugInfo getDebugInfo() {
+    public DebugInfo getDebugInfo() {
         return debugInfo;
     }
 
@@ -226,7 +226,7 @@ public final class SearchPagedResponse extends PagedResponseBase<Void, SearchRes
      *
      * @return Type of the partial response returned for a semantic query rewrites request if response was partial.
      */
-    SemanticQueryRewritesResultType getSemanticQueryRewritesResultType() {
+    public SemanticQueryRewritesResultType getSemanticQueryRewritesResultType() {
         return semanticQueryRewritesResultType;
     }
 

@@ -1112,11 +1112,10 @@ public final class SearchAsyncClient {
             .map(response -> {
                 SearchDocumentsResult result = response.getValue();
 
-                SearchPagedResponse page
-                    = new SearchPagedResponse(new SimpleResponse<>(response, getSearchResults(result, serializer)),
-                        createContinuationToken(result, serviceVersion), result.getFacets(), result.getCount(),
-                        result.getCoverage(), result.getAnswers(), result.getSemanticPartialResponseReason(),
-                        result.getSemanticPartialResponseType());
+                SearchPagedResponse page = new SearchPagedResponse(new SimpleResponse<>(response, getSearchResults(result, serializer)),
+                    createContinuationToken(result, serviceVersion), result.getFacets(), result.getCount(),
+                    result.getCoverage(), result.getAnswers(), result.getSemanticPartialResponseReason(),
+                    result.getSemanticPartialResponseType());
                 if (continuationToken == null) {
                     firstPageResponseWrapper.setFirstPageResponse(page);
                 }
