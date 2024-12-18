@@ -307,4 +307,15 @@ public class CosmosQuery {
 
         return Optional.empty();
     }
+
+    /**
+     * Creates a CosmosQuery from a SqlQuerySpec for use with functions that require a CosmosQuery.
+     *
+     * @param sqlQuerySpec The SqlQuerySpec to convert
+     * @return A CosmosQuery representing the same query
+     */
+    public static CosmosQuery fromSqlQuerySpec(@NonNull SqlQuerySpec sqlQuerySpec) {
+        return new CosmosQuery(Criteria.getInstance(CriteriaType.SQL_QUERY))
+            .with(Sort.unsorted());
+    }
 }
